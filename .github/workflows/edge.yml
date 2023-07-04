@@ -1,6 +1,7 @@
 name: Edge Browser Extract and Upload
 
 on:
+  workflow_dispatch:
   schedule:
     - cron: '0 0 * * *' # Run once daily
 
