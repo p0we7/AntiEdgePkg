@@ -61,15 +61,15 @@ jobs:
       if: steps.check-versions.outputs.version_changed_intel == 'true' || steps.check-versions.outputs.version_changed_apple == 'true'
       run: |
         if [[ "${{ steps.check-versions.outputs.version_changed_intel }}" == "true" ]]; then
-          cd Edge-Intel/Payload
+          cd Edge-Intel/MicrosoftEdge-${{ env.VERSION_URL_INTEL }}.pkg/Payload
           zip -r MicrosoftEdge-Intel.zip Microsoft\ Edge.app
-          cd ../..
+          cd ../../..
           echo "Zipped Edge.app files for Intel"
         fi
         if [[ "${{ steps.check-versions.outputs.version_changed_apple }}" == "true" ]]; then
-          cd Edge-Apple/Payload
+          cd Edge-Apple/MicrosoftEdge-${{ env.VERSION_URL_APPLE }}.pkg/Payload
           zip -r MicrosoftEdge-Apple.zip Microsoft\ Edge.app
-          cd ../..
+          cd ../../..
           echo "Zipped Edge.app files for Apple"
         fi
 
