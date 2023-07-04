@@ -54,7 +54,7 @@ jobs:
 
     - name: Create Release and Upload Assets
       if: steps.check-versions.outputs.version_changed == 'true'
-      uses: ncipollo/release-action@v1
+      uses: ncipollo/release-action@a2e71bdd4e7dab70ca26a852f29600c98b33153e # pin@v1.12.0
       with:
         artifacts: "MicrosoftEdge-Intel.zip,MicrosoftEdge-Apple.zip"
         token: ${{ secrets.GITHUB_TOKEN }}
