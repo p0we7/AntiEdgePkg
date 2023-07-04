@@ -28,11 +28,11 @@ jobs:
       run: |
         echo "version_changed_intel=false" >> $GITHUB_OUTPUT
         echo "version_changed_apple=false" >> $GITHUB_OUTPUT
-        if [[ -f "previous_version_intel" && $(cat previous_version_intel) != "${ steps.check-versions.outputs.version_changed_intel }" ]]; then
+        if [[ -f "previous_version_intel" && $(cat previous_version_intel) != "${VERSION_URL_INTEL}" ]]; then
           echo "${VERSION_URL_INTEL}" > previous_version_intel
           echo "version_changed_intel=true" >> $GITHUB_OUTPUT
         fi
-        if [[ -f "previous_version_apple" && $(cat previous_version_apple) != "${ steps.check-versions.outputs.version_changed_apple }" ]]; then
+        if [[ -f "previous_version_apple" && $(cat previous_version_apple) != "${VERSION_URL_APPLE}" ]]; then
           echo "${VERSION_URL_APPLE}" > previous_version_apple
           echo "version_changed_apple=true" >> $GITHUB_OUTPUT
         fi
