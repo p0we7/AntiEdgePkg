@@ -6,12 +6,12 @@ on:
     - cron: '0 0 * * *' # Run once daily
 
 jobs:
-  download_and_extract:
+  download_and_extract_and_upload:
     runs-on: macos-latest
 
     steps:
     - name: Checkout code
-      uses: actions/checkout@v3
+      uses: actions/checkout@main
       with:
         ref: versions
 
@@ -78,7 +78,7 @@ jobs:
 
     - name: Upload Edge.app
       if: steps.check-versions.outputs.version_changed_intel == 'true' || steps.check-versions.outputs.version_changed_apple == 'true'
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@main
       with:
         name: MicrosoftEdge
         path: |
