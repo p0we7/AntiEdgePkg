@@ -50,6 +50,7 @@ jobs:
     - name: Download and Extract Edge Browsers
       if: steps.check-versions.outputs.version_changed_intel == 'true' || steps.check-versions.outputs.version_changed_apple == 'true'
       run: |
+        echo ${VERSION_CHANGED_INTEL}
         if [[ "${VERSION_CHANGED_INTEL}" == "true" ]]; then
           curl -L -o edge-intel.pkg "https://go.microsoft.com/fwlink/?linkid=2069148&platform=Mac&Consent=0&channel=Stable"
           pkgutil --expand-full edge-intel.pkg Edge-Intel/
@@ -62,6 +63,7 @@ jobs:
     - name: Zip and Upload Edge.app
       if: steps.check-versions.outputs.version_changed_intel == 'true' || steps.check-versions.outputs.version_changed_apple == 'true'
       run: |
+        echo ${VERSION_CHANGED_INTEL}
         if [[ "${VERSION_CHANGED_INTEL}" == "true" ]]; then
           cd Edge-Intel/Payload
           zip -r MicrosoftEdge.zip Microsoft\ Edge.app
