@@ -48,13 +48,11 @@ jobs:
     - name: Download and Extract Edge Browsers
       if: steps.check-versions.outputs.version_changed_intel == 'true' || steps.check-versions.outputs.version_changed_apple == 'true'
       run: |
-        echo "VERSION_CHANGED_INTEL=$VERSION_CHANGED_INTEL"
-        if [[ "${VERSION_CHANGED_INTEL}" == "true" ]]; then
+        if [[ "${{ steps.check-versions.outputs.version_changed_intel }}" == "true" ]]; then
           curl -L -o edge-intel.pkg "https://go.microsoft.com/fwlink/?linkid=2069148&platform=Mac&Consent=0&channel=Stable"
           pkgutil --expand-full edge-intel.pkg Edge-Intel/
         fi
-        echo "VERSION_CHANGED_APPLE=$VERSION_CHANGED_APPLE"
-        if [[ "${VERSION_CHANGED_APPLE}" == "true" ]]; then
+        if [[ "${{ steps.check-versions.outputs.version_changed_apple }}" == "true" ]]; then
           curl -L -o edge-apple.pkg "https://go.microsoft.com/fwlink/?linkid=2093504&platform=Mac&Consent=0&channel=Stable"
           pkgutil --expand-full edge-apple.pkg Edge-Apple/
         fi
@@ -62,14 +60,13 @@ jobs:
     - name: Zip and Upload Edge.app
       if: steps.check-versions.outputs.version_changed_intel == 'true' || steps.check-versions.outputs.version_changed_apple == 'true'
       run: |
-        echo ${VERSION_CHANGED_INTEL}
-        if [[ "${VERSION_CHANGED_INTEL}" == "true" ]]; then
+        if [[ "${{ steps.check-versions.outputs.version_changed_intel }}" == "true" ]]; then
           cd Edge-Intel/Payload
           zip -r MicrosoftEdge-Intel.zip Microsoft\ Edge.app
           cd ../..
           echo "Zipped Edge.app files for Intel"
         fi
-        if [[ "${VERSION_CHANGED_APPLE}" == "true" ]]; then
+        if [[ "${{ steps.check-versions.outputs.version_changed_apple }}" == "true" ]]; then
           cd Edge-Apple/Payload
           zip -r MicrosoftEdge-Apple.zip Microsoft\ Edge.app
           cd ../..
