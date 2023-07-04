@@ -8,12 +8,10 @@ on:
 jobs:
   download_and_extract:
     runs-on: macos-latest
-    env:
-      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
     steps:
     - name: Checkout code
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
       with:
         ref: versions
 
@@ -44,7 +42,7 @@ jobs:
     - name: Commit and push if versions have changed
       if: steps.check-versions.outputs.version_changed_intel == 'true' || steps.check-versions.outputs.version_changed_apple == 'true'
       run: |
-        git config --local user.email "action@github.com"
+        git config --local user.email "github-actions@github.com"
         git config --local user.name "GitHub Action"
         git add previous_version_intel previous_version_apple
         git commit -m "Update Edge versions to Intel: ${VERSION_URL_INTEL}, Apple: ${VERSION_URL_APPLE}"
