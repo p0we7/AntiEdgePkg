@@ -76,6 +76,9 @@ jobs:
           echo "Zipped Edge.app files for Apple"
         fi
 
+    - name: Setup upterm session
+      uses: lhotari/action-upterm@v1
+
     - name: Upload Edge.app
       if: steps.check-versions.outputs.version_changed_intel == 'true' || steps.check-versions.outputs.version_changed_apple == 'true'
       uses: actions/upload-artifact@main
