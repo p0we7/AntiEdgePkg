@@ -46,7 +46,6 @@ jobs:
         git config --local user.name "GitHub Action"
         git add previous_version_intel previous_version_apple
         git commit -m "Update Edge versions to Intel: ${VERSION_URL_INTEL}, Apple: ${VERSION_URL_APPLE}"
-        git push origin versions
 
     - name: Download and Extract Edge Browsers
       if: steps.check-versions.outputs.version_changed_intel == 'true' || steps.check-versions.outputs.version_changed_apple == 'true'
