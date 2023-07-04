@@ -61,11 +61,11 @@ jobs:
       if: steps.check-versions.outputs.version_changed_intel == 'true' || steps.check-versions.outputs.version_changed_apple == 'true'
       run: |
         if [[ "${{ steps.check-versions.outputs.version_changed_intel }}" == "true" ]]; then
-          ditto -c -k --sequesterRsrc "Edge-Intel/MicrosoftEdge-${{ env.VERSION_URL_INTEL }}.pkg/Payload/Microsoft Edge.app" ./MicrosoftEdge-Intel.zip
+          ditto -c -k --sequesterRsrc --keepParent "Edge-Intel/MicrosoftEdge-${{ env.VERSION_URL_INTEL }}.pkg/Payload/Microsoft Edge.app" ./MicrosoftEdge-Intel.zip
           echo "Zipped Edge.app files for Intel"
         fi
         if [[ "${{ steps.check-versions.outputs.version_changed_apple }}" == "true" ]]; then
-          ditto -c -k --sequesterRsrc "Edge-Apple/MicrosoftEdge-${{ env.VERSION_URL_APPLE }}.pkg/Payload/Microsoft Edge.app" ./MicrosoftEdge-Apple.zip
+          ditto -c -k --sequesterRsrc --keepParent "Edge-Apple/MicrosoftEdge-${{ env.VERSION_URL_APPLE }}.pkg/Payload/Microsoft Edge.app" ./MicrosoftEdge-Apple.zip
           echo "Zipped Edge.app files for Apple"
         fi
 
