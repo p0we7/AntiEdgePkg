@@ -18,65 +18,45 @@ jobs:
     - name: Get Edge versions from redirect URL
       id: get-versions
       run: |
-        VERSION_URL_INTEL=$(curl -sI -L "https://go.microsoft.com/fwlink/?linkid=2069148&platform=Mac&Consent=0&channel=Stable" | grep -i Location | awk -F '/' '{print $NF}' | awk -F'-' '{print $2}' | awk -F'.' '{print $1"."$2"."$3"."$4}')
-        VERSION_URL_APPLE=$(curl -sI -L "https://go.microsoft.com/fwlink/?linkid=2093504&platform=Mac&Consent=0&channel=Stable" | grep -i Location | awk -F '/' '{print $NF}' | awk -F'-' '{print $2}' | awk -F'.' '{print $1"."$2"."$3"."$4}')
-        echo "VERSION_URL_INTEL=$VERSION_URL_INTEL" >> $GITHUB_ENV
-        echo "VERSION_URL_APPLE=$VERSION_URL_APPLE" >> $GITHUB_ENV
+        VERSION_EDGE=$(curl -sI -L "https://go.microsoft.com/fwlink/?linkid=2069148&platform=Mac&Consent=0&channel=Stable" | grep -i Location | awk -F '/' '{print $NF}' | awk -F'-' '{print $2}' | awk -F'.' '{print $1"."$2"."$3"."$4}')
+        echo "VERSION_EDGE=$VERSION_EDGE" >> $GITHUB_ENV
 
     - name: Check if versions have changed
       id: check-versions
       run: |
-        echo "version_changed_intel=false" >> $GITHUB_OUTPUT
-        echo "version_changed_apple=false" >> $GITHUB_OUTPUT
-        if [[ -f "previous_version_intel" && $(cat previous_version_intel) != "${VERSION_URL_INTEL}" ]]; then
-          echo "${VERSION_URL_INTEL}" > previous_version_intel
-          echo "version_changed_intel=true" >> $GITHUB_OUTPUT
-        fi
-        if [[ -f "previous_version_apple" && $(cat previous_version_apple) != "${VERSION_URL_APPLE}" ]]; then
-          echo "${VERSION_URL_APPLE}" > previous_version_apple
-          echo "version_changed_apple=true" >> $GITHUB_OUTPUT
+        echo "version_changed=false" >> $GITHUB_OUTPUT
+        if [[ -f "previous_version" && $(cat previous_version) != "${VERSION_EDGE}" ]]; then
+          echo "${VERSION_EDGE}" > previous_version
+          echo "version_changed=true" >> $GITHUB_OUTPUT
         fi
 
     - name: Commit and push if versions have changed
-      if: steps.check-versions.outputs.version_changed_intel == 'true' || steps.check-versions.outputs.version_changed_apple == 'true'
+      if: steps.check-versions.outputs.version_changed == 'true'
       run: |
         git config --local user.email "github-actions@github.com"
         git config --local user.name "GitHub Action"
-        git add previous_version_intel previous_version_apple
-        git commit -m "Update Edge versions to Intel: ${VERSION_URL_INTEL}, Apple: ${VERSION_URL_APPLE}"
+        git add previous_version
+        # git commit -m "Update Edge versions to: ${VERSION_EDGE}"
 
     - name: Download and Extract Edge Browsers
-      if: steps.check-versions.outputs.version_changed_intel == 'true' || steps.check-versions.outputs.version_changed_apple == 'true'
+      if: steps.check-versions.outputs.version_changed == 'true'
       run: |
-        if [[ "${{ steps.check-versions.outputs.version_changed_intel }}" == "true" ]]; then
-          curl -L -o edge-intel.pkg "https://go.microsoft.com/fwlink/?linkid=2069148&platform=Mac&Consent=0&channel=Stable"
-          pkgutil --expand-full edge-intel.pkg Edge-Intel/
-        fi
-        if [[ "${{ steps.check-versions.outputs.version_changed_apple }}" == "true" ]]; then
-          curl -L -o edge-apple.pkg "https://go.microsoft.com/fwlink/?linkid=2093504&platform=Mac&Consent=0&channel=Stable"
-          pkgutil --expand-full edge-apple.pkg Edge-Apple/
-        fi
+        curl -L -o edge-intel.pkg "https://go.microsoft.com/fwlink/?linkid=2069148&platform=Mac&Consent=0&channel=Stable"
+        curl -L -o edge-apple.pkg "https://go.microsoft.com/fwlink/?linkid=2093504&platform=Mac&Consent=0&channel=Stable"
+        pkgutil --expand-full edge-intel.pkg Edge-Intel/
+        pkgutil --expand-full edge-apple.pkg Edge-Apple/
 
-    - name: Zip and Upload Edge.app
-      if: steps.check-versions.outputs.version_changed_intel == 'true' || steps.check-versions.outputs.version_changed_apple == 'true'
+    - name: Zip Edge.app
+      if: steps.check-versions.outputs.version_changed == 'true'
       run: |
-        if [[ "${{ steps.check-versions.outputs.version_changed_intel }}" == "true" ]]; then
-          ditto -c -k --sequesterRsrc --keepParent "Edge-Intel/MicrosoftEdge-${{ env.VERSION_URL_INTEL }}.pkg/Payload/Microsoft Edge.app" ./MicrosoftEdge-Intel.zip
-          echo "Zipped Edge.app files for Intel"
-        fi
-        if [[ "${{ steps.check-versions.outputs.version_changed_apple }}" == "true" ]]; then
-          ditto -c -k --sequesterRsrc --keepParent "Edge-Apple/MicrosoftEdge-${{ env.VERSION_URL_APPLE }}.pkg/Payload/Microsoft Edge.app" ./MicrosoftEdge-Apple.zip
-          echo "Zipped Edge.app files for Apple"
-        fi
+        ditto -c -k --sequesterRsrc --keepParent "Edge-Intel/MicrosoftEdge-${{ env.VERSION_EDGE }}.pkg/Payload/Microsoft Edge.app" ./MicrosoftEdge-Intel.zip
+        ditto -c -k --sequesterRsrc --keepParent "Edge-Apple/MicrosoftEdge-${{ env.VERSION_EDGE }}.pkg/Payload/Microsoft Edge.app" ./MicrosoftEdge-Apple.zip
 
-    - name: Setup upterm session
-      uses: lhotari/action-upterm@v1
-
-    - name: Upload Edge.app
-      if: steps.check-versions.outputs.version_changed_intel == 'true' || steps.check-versions.outputs.version_changed_apple == 'true'
-      uses: actions/upload-artifact@main
+    - name: Create Release and Upload Assets
+      if: steps.check-versions.outputs.version_changed == 'true'
+      uses: ncipollo/release-action@v1
       with:
-        name: MicrosoftEdge
-        path: |
-          MicrosoftEdge-Intel.zip
-          MicrosoftEdge-Apple.zip
+        artifacts: "MicrosoftEdge-Intel.zip,MicrosoftEdge-Apple.zip"
+        token: ${{ secrets.GITHUB_TOKEN }}
+        tag: ${{ env.VERSION_EDGE }}
+        name: ${{ env.VERSION_EDGE }}
