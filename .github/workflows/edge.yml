@@ -26,18 +26,16 @@ jobs:
     - name: Check if versions have changed
       id: check-versions
       run: |
-        VERSION_CHANGED_INTEL=false
-        VERSION_CHANGED_APPLE=false
+        echo "VERSION_CHANGED_INTEL=false" >> $GITHUB_ENV
+        echo "VERSION_CHANGED_APPLE=false" >> $GITHUB_ENV
         if [[ -f "previous_version_intel" && $(cat previous_version_intel) != "${VERSION_URL_INTEL}" ]]; then
           echo "${VERSION_URL_INTEL}" > previous_version_intel
-          VERSION_CHANGED_INTEL=true
+          echo "VERSION_CHANGED_INTEL=true" >> $GITHUB_ENV
         fi
         if [[ -f "previous_version_apple" && $(cat previous_version_apple) != "${VERSION_URL_APPLE}" ]]; then
           echo "${VERSION_URL_APPLE}" > previous_version_apple
-          VERSION_CHANGED_APPLE=true
+          echo "VERSION_CHANGED_APPLE=true" >> $GITHUB_ENV
         fi
-        echo "::set-output name=version_changed_intel::$VERSION_CHANGED_INTEL"
-        echo "::set-output name=version_changed_apple::$VERSION_CHANGED_APPLE"
 
     - name: Commit and push if versions have changed
       if: steps.check-versions.outputs.version_changed_intel == 'true' || steps.check-versions.outputs.version_changed_apple == 'true'
@@ -50,11 +48,12 @@ jobs:
     - name: Download and Extract Edge Browsers
       if: steps.check-versions.outputs.version_changed_intel == 'true' || steps.check-versions.outputs.version_changed_apple == 'true'
       run: |
-        echo ${VERSION_CHANGED_INTEL}
+        echo "VERSION_CHANGED_INTEL=$VERSION_CHANGED_INTEL"
         if [[ "${VERSION_CHANGED_INTEL}" == "true" ]]; then
           curl -L -o edge-intel.pkg "https://go.microsoft.com/fwlink/?linkid=2069148&platform=Mac&Consent=0&channel=Stable"
           pkgutil --expand-full edge-intel.pkg Edge-Intel/
         fi
+        echo "VERSION_CHANGED_APPLE=$VERSION_CHANGED_APPLE"
         if [[ "${VERSION_CHANGED_APPLE}" == "true" ]]; then
           curl -L -o edge-apple.pkg "https://go.microsoft.com/fwlink/?linkid=2093504&platform=Mac&Consent=0&channel=Stable"
           pkgutil --expand-full edge-apple.pkg Edge-Apple/
