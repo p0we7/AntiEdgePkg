@@ -37,6 +37,7 @@ jobs:
         git config --local user.name "GitHub Action"
         git add previous_version
         git commit -m "Update Edge versions to: ${VERSION_EDGE}"
+        git push origin versions
 
     - name: Download and Extract Edge Browsers
       if: steps.check-versions.outputs.version_changed == 'true'
