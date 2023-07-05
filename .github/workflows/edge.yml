@@ -19,7 +19,7 @@ jobs:
       id: get-versions
       run: |
         curl -LOs https://msedgedriver.azureedge.net/LATEST_STABLE
-        VERSION_EDGE=$(cat LATEST_STABLE)
+        VERSION_EDGE=$(iconv -f UTF-16 -t UTF-8 LATEST_STABLE | cat)
         echo "VERSION_EDGE=$VERSION_EDGE" >> $GITHUB_ENV
 
     - name: Check if versions have changed
