@@ -18,8 +18,7 @@ jobs:
     - name: Get Edge versions from redirect URL
       id: get-versions
       run: |
-        curl -LOs https://msedgedriver.azureedge.net/LATEST_STABLE
-        VERSION_EDGE=$(iconv -f UTF-16 -t UTF-8 LATEST_STABLE | cat)
+        VERSION_EDGE=$(curl -sI -L "https://go.microsoft.com/fwlink/?linkid=2069148&platform=Mac&Consent=0&channel=Stable" | grep -i Location | awk -F '/' '{print $NF}' | awk -F'-' '{print $2}' | awk -F'.' '{print $1"."$2"."$3"."$4}')
         echo "VERSION_EDGE=$VERSION_EDGE" >> $GITHUB_ENV
 
     - name: Check if versions have changed
